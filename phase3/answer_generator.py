@@ -13,7 +13,9 @@ from datetime import datetime
 from llm_config import LLMConfig, setup_logging
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase2'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase4'))
 from simple_retrieval_pipeline import RetrievalPipeline
+from safety import SafetyLayer, QueryType
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,7 @@ class AnswerGenerator:
     def __init__(self, config: Optional[LLMConfig] = None):
         self.config = config or LLMConfig.from_env()
         self.retrieval_pipeline = RetrievalPipeline()
+        self.safety_layer = SafetyLayer()
         self._setup_llm_client()
         
     def _setup_llm_client(self):
@@ -189,16 +192,18 @@ RULES:
         start_time = datetime.now()
         
         try:
-            # Classify query
-            query_type = self._classify_query(query)
-            logger.info(f"Query classified as: {query_type}")
+            # Classify query using safety layer
+            query_type = self.safety_layer.classify_query(query)
+            self.safety_layer.log_query_classification(query, query_type)
             
-            # Handle out-of-scope queries
-            if query_type in self.OUT_OF_SCOPE_RESPONSES:
+            # Handle blocked queries
+            if self.safety_layer.should_block_query(query_type):
+                refusal = self.safety_layer.get_refusal_response(query_type)
+                logger.info(f"Query blocked: {query_type}")
                 return {
                     "query": query,
-                    "answer": self.OUT_OF_SCOPE_RESPONSES[query_type],
-                    "type": "out_of_scope_refusal",
+                    "answer": refusal,
+                    "type": f"{query_type}_refusal",
                     "confidence": "high",
                     "retrieved_chunks": [],
                     "processing_time": (datetime.now() - start_time).total_seconds(),
@@ -215,7 +220,7 @@ RULES:
             if not retrieved_chunks:
                 return {
                     "query": query,
-                    "answer": "I couldn't find specific information about your query in the ICICI Prudential scheme documents. Please try rephrasing your question or contact ICICI Prudential customer care for detailed assistance.",
+                    "answer": "I couldn't find specific information about your query in my current knowledge base. Please check official ICICI Prudential factsheet or contact customer support.",
                     "type": "no_information",
                     "confidence": "low",
                     "retrieved_chunks": [],
@@ -223,19 +228,20 @@ RULES:
                     "timestamp": datetime.now().isoformat()
                 }
             
+            # Get safe query for LLM (remove PII if detected)
+            safe_query = self.safety_layer.get_safe_query_for_llm(query, query_type)
+            
             # Format context
             context = self._format_context(retrieved_chunks)
             
             # Create prompt
-            prompt = f"""User Query: {query}
-
+            prompt = f"""CONTEXT FROM KNOWLEDGE BASE:
 {context}
 
-Please provide a concise answer based on the information above. Remember to:
-1. Answer directly and factually
-2. Include exactly one source citation
-3. Keep it to maximum 3 sentences
-4. Add "Last updated: [current date]" at the end"""
+USER QUESTION:
+{safe_query if safe_query != query else query}
+
+Provide a factual answer following all rules in the system prompt."""
             
             # Generate answer
             if self.config.provider == "groq":
@@ -247,22 +253,21 @@ Please provide a concise answer based on the information above. Remember to:
             else:
                 raise ValueError(f"Unsupported provider: {self.config.provider}")
             
-            # Validate citation
+            # Validate citation and response quality
             available_urls = self._extract_urls_from_chunks(retrieved_chunks)
             citation_valid = self._validate_citation(answer, available_urls)
             
-            # Add timestamp if not present
-            if "Last updated:" not in answer:
-                current_date = datetime.now().strftime("%Y-%m-%d")
-                answer += f"\nLast updated: {current_date}"
+            # Additional quality validation using safety layer
+            quality_check = self.safety_layer.validate_response_quality(answer, query_type)
             
             return {
                 "query": query,
                 "answer": answer,
                 "type": "factual_answer",
-                "confidence": "high" if citation_valid else "medium",
-                "retrieved_chunks": retrieved_chunks[:3],  # Return top 3 chunks
+                "confidence": "high" if retrieved_chunks[0]["score"] < 0.5 else "medium",
+                "retrieved_chunks": retrieved_chunks[:3],
                 "citation_valid": citation_valid,
+                "quality_check": quality_check,
                 "processing_time": (datetime.now() - start_time).total_seconds(),
                 "timestamp": datetime.now().isoformat()
             }
