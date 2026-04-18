@@ -1,4 +1,4 @@
-name: Daily Fund Data Scraping
+name: Complete Daily Ingest Pipeline
 
 on:
   schedule:
@@ -8,6 +8,8 @@ on:
     branches: [ main, develop ]
     paths: 
       - 'phase1/**'
+      - 'phase2/**'
+      - 'scripts/**'
       - 'config/**'
 
 env:
@@ -15,7 +17,7 @@ env:
   CHROME_VERSION: 'latest'
 
 jobs:
-  scrape-fund-data:
+  complete-ingest-pipeline:
     runs-on: ubuntu-latest
     
     steps:
@@ -48,54 +50,77 @@ jobs:
           
       - name: Create necessary directories
         run: |
-          mkdir -p raw_data processed_data logs
+          mkdir -p raw_data processed_data logs phase2
           
-      - name: Run scraping service
+      - name: Run Complete Daily Ingest Pipeline
         run: |
-          cd phase1/scraping_service
-          python scraping_service.py
+          python scripts/daily_ingest_pipeline.py
         env:
           HEADLESS: true
           LOG_LEVEL: INFO
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           
-      - name: Run scheduler service
-        run: |
-          cd phase1/scheduler_service
-          python scheduler_service.py
-        env:
-          SCHEDULE_MODE: manual
-          LOG_LEVEL: INFO
-          
-      - name: Validate scraped data
+      - name: Validate Pipeline Results
         run: |
           python -c "
           import json
           import os
+          import pickle
           from pathlib import Path
           
-          raw_data_dir = Path('raw_data')
-          if not raw_data_dir.exists():
-              raise Exception('No raw_data directory found')
-              
-          json_files = list(raw_data_dir.glob('*.json'))
-          if not json_files:
-              raise Exception('No JSON files found in raw_data')
-              
-          print(f'Found {len(json_files)} JSON files')
+          print('Validating pipeline results...')
           
-          for file in sorted(json_files)[-3:]:  # Check last 3 files
-              with open(file, 'r') as f:
-                  data = json.load(f)
-                  print(f'Validated {file.name}: {len(data.get(\"schemes\", []))} schemes')
+          # Check raw data
+          raw_data_dir = Path('raw_data')
+          raw_files = list(raw_data_dir.glob('*.json'))
+          print(f'✅ Raw data files: {len(raw_files)}')
+          
+          # Check processed data
+          processed_data_dir = Path('processed_data')
+          processed_files = list(processed_data_dir.glob('*.json'))
+          print(f'✅ Processed data files: {len(processed_files)}')
+          
+          # Check embeddings
+          phase2_dir = Path('phase2')
+          embeddings_files = list(phase2_dir.glob('embeddings*.pkl'))
+          print(f'✅ Embedding files: {len(embeddings_files)}')
+          
+          # Check FAISS index
+          faiss_index = phase2_dir / 'faiss_index.bin'
+          if faiss_index.exists():
+              print('✅ FAISS index exists')
+              # Check index size
+              import faiss
+              index = faiss.read_index(str(faiss_index))
+              print(f'✅ FAISS index vectors: {index.ntotal}')
+          else:
+              raise Exception('FAISS index not found')
+          
+          # Check metadata
+          metadata_file = phase2_dir / 'metadata_store.json'
+          if metadata_file.exists():
+              with open(metadata_file, 'r') as f:
+                  metadata = json.load(f)
+                  print(f'✅ Metadata entries: {len(metadata)}')
+          else:
+              raise Exception('Metadata file not found')
+          
+          print('✅ All pipeline validations passed!')
           "
           
-      - name: Upload scraped data
+      - name: Upload pipeline artifacts
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: fund-data-${{ github.run_number }}
+          name: ingest-pipeline-${{ github.run_number }}
           path: |
             raw_data/
+            processed_data/
+            phase2/embeddings*.pkl
+            phase2/embeddings*.json
+            phase2/faiss_index.bin
+            phase2/metadata_store.json
             logs/
           retention-days: 30
           
@@ -103,18 +128,33 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add raw_data/ logs/
+          
+          # Add all pipeline outputs
+          git add raw_data/ processed_data/ phase2/embeddings*.pkl phase2/embeddings*.json phase2/faiss_index.bin phase2/metadata_store.json logs/
+          
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto-update: Fund data scraped on $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "Auto-update: Complete ingest pipeline executed on $(date '+%Y-%m-%d %H:%M:%S')
+            
+            - Scraped latest fund data
+            - Processed into chunks  
+            - Generated embeddings
+            - Updated FAISS vector database"
             git push
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Trigger downstream pipeline
+        if: success()
+        run: |
+          echo "Triggering downstream RAG pipeline..."
+          # This will automatically trigger pipeline.yml due to file changes
+          
       - name: Notify on failure
         if: failure()
         run: |
-          echo "Scraping failed! Check logs for details."
-          # Add email notification logic here if needed
+          echo "❌ Complete ingest pipeline failed! Check logs for details."
+          echo "Failed at: $(date '+%Y-%m-%d %H:%M:%S')"
+          # Add email/Slack notification logic here if needed

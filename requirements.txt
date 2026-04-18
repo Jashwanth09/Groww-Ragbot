@@ -35,7 +35,7 @@ pytest-mock==3.12.0
 
 # Phase 1.2 & 1.3: Document Processing and Chunking
 PyMuPDF==1.23.8  # For PDF processing
-hashlib  # Built-in, for content hashing
+# hashlib is built-in, for content hashing
 
 # Phase 2: Embedding and Vector Database (Free)
 sentence-transformers==2.2.2
