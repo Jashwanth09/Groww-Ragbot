@@ -1,0 +1,30 @@
+{
+  "schedule": {
+    "hour": 9,
+    "minute": 15,
+    "timezone": "Asia/Kolkata"
+  },
+  "urls": [
+    "https://groww.in/mutual-funds/icici-prudential-dynamic-plan-direct-growth",
+    "https://groww.in/mutual-funds/icici-prudential-large-cap-fund-direct-growth",
+    "https://groww.in/mutual-funds/icici-prudential-nifty-next-50-index-fund-direct-growth",
+    "https://groww.in/mutual-funds/icici-prudential-top-100-fund-direct-growth"
+  ],
+  "retry": {
+    "max_attempts": 3,
+    "backoff_factor": 2,
+    "delay": 60
+  },
+  "email": {
+    "enabled": false,
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender_email": "",
+    "sender_password": "",
+    "recipient_emails": []
+  },
+  "monitoring": {
+    "health_check_interval": 3600,
+    "max_consecutive_failures": 3
+  }
+}

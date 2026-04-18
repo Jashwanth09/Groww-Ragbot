@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "collection_metadata": {
+    "date": "2026-04-17",
+    "source": "Groww",
+    "total_schemes": 4,
+    "data_quality_score": 0.8,
+    "extraction_method": "selenium_webdriver"
+  },
+  "schemes": [
+    {
+      "scheme_identifier": {
+        "name": "ICICI Prudential Multi Asset Fund Direct Growth",
+        "code": "INF174K01025",
+        "category": "Hybrid",
+        "risk_level": "Very High"
+      },
+      "key_metrics": {
+        "nav": {
+          "value": 16.23,
+          "date": "2026-04-17",
+          "currency": "INR"
+        },
+        "minimum_sip": 5000,
+        "fund_size": {
+          "value": 7789.45,
+          "unit": "Cr",
+          "currency": "INR"
+        },
+        "expense_ratio": 0.64,
+        "rating": "Very High Risk"
+      },
+      "source_data": {
+        "url": "https://groww.in/mutual-funds/icici-prudential-dynamic-plan-direct-growth",
+        "scraped_at": "2026-04-17T18:25:45",
+        "last_updated": "2026-04-17T18:25:45"
+      }
+    }
+  ],
+  "data_quality": {
+    "nav_extraction": "good",
+    "sip_extraction": "needs_refinement", 
+    "fund_size_extraction": "failed",
+    "expense_ratio_extraction": "excellent",
+    "rating_extraction": "good"
+  }
+}

@@ -1,0 +1,30 @@
+=== investor_services ===
+
+            ICICI Prudential Mutual Fund - Investor Services Guide
+            
+            How to Download Account Statement:
+            
+            1. Visit the ICICI Prudential Mutual Fund website (www.icicipruamc.com)
+            2. Click on 'Investor Services' or 'Login'
+            3. Enter your Folio Number and PAN
+            4. Click on 'Statement Download'
+            5. Select the period for which you need the statement
+            6. Choose the format (PDF or Excel)
+            7. Download the statement
+            
+            How to Download Capital Gains Statement (CAS):
+            
+            1. Log in to your account on the ICICI Prudential website
+            2. Go to 'Tax Documents' section
+            3. Select 'Capital Gains Statement'
+            4. Choose the financial year
+            5. Download the Consolidated Account Statement (CAS)
+            
+            For assistance, contact:
+            - Customer Care: 1860 266 7766
+            - Email: investor@icicipruamc.com
+            - Website: www.icicipruamc.com
+            
+            Last Updated: April 2024
+            
+
