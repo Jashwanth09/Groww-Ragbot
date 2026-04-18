@@ -27,7 +27,15 @@ class AnswerGenerator:
         
     def _setup_llm_client(self):
         """Initialize LLM client based on provider"""
-        if self.config.provider == "openai":
+        if self.config.provider == "groq":
+            try:
+                import groq
+                self.client = groq.Groq(api_key=self.config.api_key)
+                logger.info("Groq client initialized")
+            except ImportError:
+                raise ImportError("Groq library not installed. Run: pip install groq")
+                
+        elif self.config.provider == "openai":
             try:
                 import openai
                 self.client = openai.OpenAI(api_key=self.config.api_key)
@@ -103,6 +111,23 @@ RULES:
             if 'metadata' in chunk and 'source_url' in chunk['metadata']:
                 urls.append(chunk['metadata']['source_url'])
         return list(set(urls))  # Remove duplicates
+
+    def _generate_with_groq(self, prompt: str) -> str:
+        """Generate response using Groq"""
+        try:
+            response = self.client.chat.completions.create(
+                model=self.config.model,
+                messages=[
+                    {"role": "system", "content": self.SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=self.config.max_tokens,
+                temperature=self.config.temperature
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"Groq API error: {e}")
+            return "I apologize, but I'm unable to process your request at the moment. Please try again later."
 
     def _generate_with_openai(self, prompt: str) -> str:
         """Generate response using OpenAI"""
@@ -213,7 +238,9 @@ Please provide a concise answer based on the information above. Remember to:
 4. Add "Last updated: [current date]" at the end"""
             
             # Generate answer
-            if self.config.provider == "openai":
+            if self.config.provider == "groq":
+                answer = self._generate_with_groq(prompt)
+            elif self.config.provider == "openai":
                 answer = self._generate_with_openai(prompt)
             elif self.config.provider == "anthropic":
                 answer = self._generate_with_anthropic(prompt)

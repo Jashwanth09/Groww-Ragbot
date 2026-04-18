@@ -576,25 +576,32 @@ Phase 3: LLM Integration & Answer Generation
 Phase 3.1: LLM Selection & Configuration
 Objective: Choose and configure LLM for answer generation with strict fact-only behavior
 3.1.1 Model Options
-Option A: GPT-4o-mini
+Option A: Groq Llama 3 70B
+
+Cost: $0.05/1M input tokens, $0.08/1M output tokens
+Pros: Fastest response, cheapest, excellent performance
+Cons: Limited to Groq platform
+Setup: GROQ_API_KEY=gsk_your_key_here
+
+Option B: GPT-4o-mini
 
 Cost: $0.15/1M input tokens, $0.60/1M output tokens
 Pros: Fast, cheap, good instruction-following
 Cons: Requires OpenAI API key
 
-Option B: Claude 3.5 Haiku
+Option C: Claude 3.5 Haiku
 
 Cost: $0.25/1M input tokens, $1.25/1M output tokens
 Pros: Excellent at refusals, citation accuracy
 Cons: Slightly more expensive
 
-Option C: Llama 3.1 8B (Local)
+Option D: Llama 3.1 8B (Local)
 
 Cost: Free (if self-hosted)
 Pros: No API costs, privacy
 Cons: Needs GPU, lower quality
 
-Recommended: GPT-4o-mini (best cost/performance for prototype)
+Recommended: Groq Llama 3 70B (best speed/cost for production)
 
 Phase 3.2: Prompt Engineering
 Objective: Design system prompt for accurate, concise, citation-backed answers

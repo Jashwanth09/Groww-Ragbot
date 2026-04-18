@@ -30,7 +30,11 @@ class LLMConfig:
             load_dotenv()
         
         # Determine provider and model
-        if os.getenv('OPENAI_API_KEY'):
+        if os.getenv('GROQ_API_KEY'):
+            provider = "groq"
+            model = os.getenv('GROQ_MODEL', 'llama3-70b-8192')
+            api_key = os.getenv('GROQ_API_KEY')
+        elif os.getenv('OPENAI_API_KEY'):
             provider = "openai"
             model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
             api_key = os.getenv('OPENAI_API_KEY')
@@ -56,7 +60,10 @@ class LLMConfig:
     
     def validate(self) -> bool:
         """Validate configuration"""
-        if self.provider == "openai" and not self.api_key:
+        if self.provider == "groq" and not self.api_key:
+            logger.error("Groq API key not found. Set GROQ_API_KEY environment variable.")
+            return False
+        elif self.provider == "openai" and not self.api_key:
             logger.error("OpenAI API key not found. Set OPENAI_API_KEY environment variable.")
             return False
         elif self.provider == "anthropic" and not self.api_key:
