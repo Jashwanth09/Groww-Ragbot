@@ -1,31 +1,38 @@
 {
   "version": "1.0",
   "collection_metadata": {
-    "date": "2026-04-17",
+    "date": "2026-09-07",
     "source": "Groww",
     "total_schemes": 4,
-    "data_quality_score": 0.8,
-    "extraction_method": "seed_plus_scraper"
+    "data_quality_score": 0.6,
+    "extraction_method": "selenium_webdriver"
   },
   "schemes": [
     {
       "scheme_identifier": {
-        "name": "ICICI Prudential Multi Asset Fund Direct Growth",
-        "code": "INF174K01025",
+        "name": "ICICI Prudential Multi Asset Allocation Fund Direct Growth",
         "category": "Hybrid",
         "risk_level": "Very High"
       },
       "key_metrics": {
-        "nav": { "value": 16.23, "date": "2026-04-17", "currency": "INR" },
-        "minimum_sip": 5000,
-        "fund_size": { "value": 7789.45, "unit": "Cr", "currency": "INR" },
-        "expense_ratio": 0.64,
-        "rating": "Very High Risk"
+        "nav": {
+          "value": 904.59,
+          "date": "2026-09-07",
+          "currency": "INR"
+        },
+        "minimum_sip": 0,
+        "fund_size": {
+          "value": null,
+          "unit": null,
+          "currency": "INR"
+        },
+        "expense_ratio": 0.84,
+        "rating": "Very High"
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-dynamic-plan-direct-growth",
-        "scraped_at": "2026-04-17T18:25:45",
-        "last_updated": "2026-04-17T18:25:45"
+        "scraped_at": "2026-09-07T17:21:58.135316",
+        "last_updated": "2026-09-07T17:21:58.135306"
       }
     },
     {
@@ -35,16 +42,24 @@
         "risk_level": "Very High"
       },
       "key_metrics": {
-        "nav": { "value": 15.2345, "date": "2026-04-17", "currency": "INR" },
-        "minimum_sip": 5000,
-        "fund_size": { "value": 15234.56, "unit": "Cr", "currency": "INR" },
-        "expense_ratio": 0.42,
-        "rating": "Very High Risk"
+        "nav": {
+          "value": 118.9,
+          "date": "2026-09-07",
+          "currency": "INR"
+        },
+        "minimum_sip": 0,
+        "fund_size": {
+          "value": null,
+          "unit": null,
+          "currency": "INR"
+        },
+        "expense_ratio": 1.0,
+        "rating": "Very High"
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-large-cap-fund-direct-growth",
-        "scraped_at": "2026-04-17T18:25:45",
-        "last_updated": "2026-04-17T18:25:45"
+        "scraped_at": "2026-09-07T17:22:05.823679",
+        "last_updated": "2026-09-07T17:22:05.823667"
       }
     },
     {
@@ -54,36 +69,59 @@
         "risk_level": "Very High"
       },
       "key_metrics": {
-        "nav": { "value": 72.18, "date": "2026-04-17", "currency": "INR" },
-        "minimum_sip": 500,
-        "fund_size": { "value": 2845.67, "unit": "Cr", "currency": "INR" },
-        "expense_ratio": 0.3,
-        "rating": "Very High Risk"
+        "nav": {
+          "value": 50.0,
+          "date": "2026-09-07",
+          "currency": "INR"
+        },
+        "minimum_sip": 0,
+        "fund_size": {
+          "value": null,
+          "unit": null,
+          "currency": "INR"
+        },
+        "expense_ratio": 0.37,
+        "rating": "Very High"
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-nifty-next-50-index-fund-direct-growth",
-        "scraped_at": "2026-04-17T18:25:45",
-        "last_updated": "2026-04-17T18:25:45"
+        "scraped_at": "2026-09-07T17:22:12.628158",
+        "last_updated": "2026-09-07T17:22:12.628147"
       }
     },
     {
       "scheme_identifier": {
-        "name": "ICICI Prudential Top 100 Fund Direct Growth",
+        "name": "ICICI Prudential Large & Mid Cap Fund Direct Plan Growth",
         "category": "Large & Mid Cap",
         "risk_level": "Very High"
       },
       "key_metrics": {
-        "nav": { "value": 98.41, "date": "2026-04-17", "currency": "INR" },
-        "minimum_sip": 5000,
-        "fund_size": { "value": 8234.56, "unit": "Cr", "currency": "INR" },
-        "expense_ratio": 0.76,
-        "rating": "Very High Risk"
+        "nav": {
+          "value": 1178.57,
+          "date": "2026-09-07",
+          "currency": "INR"
+        },
+        "minimum_sip": 0,
+        "fund_size": {
+          "value": null,
+          "unit": null,
+          "currency": "INR"
+        },
+        "expense_ratio": 1.27,
+        "rating": "Very High"
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-top-100-fund-direct-growth",
-        "scraped_at": "2026-04-17T18:25:45",
-        "last_updated": "2026-04-17T18:25:45"
+        "scraped_at": "2026-09-07T17:22:19.725517",
+        "last_updated": "2026-09-07T17:22:19.725506"
       }
     }
-  ]
+  ],
+  "data_quality": {
+    "nav_extraction": "good",
+    "sip_extraction": "good",
+    "fund_size_extraction": "failed",
+    "expense_ratio_extraction": "excellent",
+    "rating_extraction": "good"
+  }
 }
