@@ -19,6 +19,7 @@ from email.mime.multipart import MIMEMultipart
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Import scraping service
 try:
@@ -27,12 +28,19 @@ except ImportError:
     print("Warning: Could not import scraping_service. Make sure it's in the correct path.")
     GrowwScraper = None
 
+# Import data cleanup
+try:
+    from data_cleanup import DataCleanupManager
+except ImportError:
+    print("Warning: Could not import data_cleanup. Manual cleanup only.")
+    DataCleanupManager = None
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('../logs/scheduler_service.log'),
+        logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'logs', 'scheduler_service.log')),
         logging.StreamHandler()
     ]
 )
@@ -219,8 +227,12 @@ class FundDataScheduler:
                 misfire_grace_time=300  # 5 minutes grace period
             )
             
-            next_run = self.scheduler.get_job('daily_fund_data_update').next_run_time
-            logger.info(f"Daily job scheduled. Next run: {next_run}")
+            job = self.scheduler.get_job('daily_fund_data_update')
+            if job and hasattr(job, 'next_run_time') and job.next_run_time:
+                next_run = job.next_run_time
+                logger.info(f"Daily job scheduled. Next run: {next_run}")
+            else:
+                logger.info("Daily job scheduled but next run time not available")
             
         except Exception as e:
             logger.error(f"Failed to setup daily job: {str(e)}")
@@ -264,6 +276,9 @@ class FundDataScheduler:
                     
                     # Trigger reprocessing pipeline (placeholder)
                     self._trigger_reprocessing_pipeline(filepath)
+                    
+                    # Run data cleanup after successful collection
+                    self._run_data_cleanup()
                     
                 except Exception as e:
                     collection_result["errors"].append(f"Failed to save data: {str(e)}")
@@ -394,6 +409,29 @@ class FundDataScheduler:
         except Exception as e:
             logger.error(f"Failed to send failure alert: {str(e)}")
     
+    def _run_data_cleanup(self):
+        """Run data cleanup after successful data collection"""
+        if not DataCleanupManager:
+            logger.warning("DataCleanupManager not available. Skipping cleanup.")
+            return
+        
+        try:
+            logger.info("Running data cleanup...")
+            cleanup_manager = DataCleanupManager()
+            
+            # Run cleanup (not dry run)
+            cleanup_results = cleanup_manager.cleanup_outdated_data(dry_run=False)
+            
+            logger.info(f"Cleanup completed: {cleanup_results['outdated_files']} outdated files deleted, {cleanup_results['current_day_files']} current files kept")
+            
+            if cleanup_results['failed_deletions']:
+                logger.warning(f"Failed to delete {len(cleanup_results['failed_deletions'])} files")
+                for failure in cleanup_results['failed_deletions']:
+                    logger.warning(f"  - {failure['file']}: {failure['error']}")
+            
+        except Exception as e:
+            logger.error(f"Data cleanup failed: {str(e)}")
+
     def _send_email(self, subject: str, body: str):
         """Send email notification"""
         try:
@@ -465,7 +503,7 @@ class FundDataScheduler:
                 
                 # Get next run time for daily job
                 daily_job = self.scheduler.get_job('daily_fund_data_update')
-                if daily_job:
+                if daily_job and hasattr(daily_job, 'next_run_time') and daily_job.next_run_time:
                     status["next_run_time"] = daily_job.next_run_time.isoformat()
                     
             except Exception as e:

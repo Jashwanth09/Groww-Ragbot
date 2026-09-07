@@ -1,0 +1,17 @@
+{
+  "filename": "investor_services",
+  "processed_at": "2026-04-18T00:17:27.038628",
+  "content": [
+    {
+      "text": "icici prudential mutual fund - investor services guide how to download account statement: 1.visit the icici prudential mutual fund website (www.icicipruamc.com) 2.click on 'investor services' or 'login' 3.enter your folio number and pan 4.click on 'statement download' 5.select the period for which you need the statement 6.choose the format (pdf or excel) 7.download the statement how to download capital gains statement (cas): 1.log in to your account on the icici prudential website 2.go to 'tax documents' section 3.select 'capital gains statement' 4.choose the financial year 5.download the consolidated account statement (cas) for assistancecontact: - customer care: 18602667766- email: investor@icicipruamc.com - website: www.icicipruamc.com last updated: 2024-04",
+      "content_type": "investor_services",
+      "scheme": "general",
+      "source_url": "https://www.icicipruamc.com/investor-services",
+      "normalized": true,
+      "normalized_at": "2026-04-19T20:45:23.629660"
+    }
+  ],
+  "total_sections": 1,
+  "normalized": true,
+  "normalized_at": "2026-04-19T20:45:23.630636"
+}

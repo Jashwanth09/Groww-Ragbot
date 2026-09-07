@@ -15,7 +15,7 @@ import hashlib
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class HybridDocumentChunker:
+class HybridChunkingPipeline:
     """Implements hybrid chunking strategy: semantic + fixed-size with overlap"""
     
     def __init__(self, raw_documents_dir: str = "../raw_documents"):
@@ -89,7 +89,21 @@ class HybridDocumentChunker:
         """Apply hybrid chunking strategy to all documents"""
         all_chunks = []
         
-        for doc in documents:
+        for raw_doc in documents:
+            filename = raw_doc.get('filename', raw_doc.get('metadata', {}).get('source_file', 'unknown_file'))
+            content = raw_doc.get('content', raw_doc.get('text', ''))
+            scheme = raw_doc.get('scheme', raw_doc.get('metadata', {}).get('scheme_name', 'General'))
+            content_type = raw_doc.get('content_type', raw_doc.get('metadata', {}).get('document_type', 'unknown'))
+            source_url = raw_doc.get('source_url', raw_doc.get('metadata', {}).get('source_url', ''))
+
+            doc = {
+                'filename': filename,
+                'content': content,
+                'scheme': scheme,
+                'content_type': content_type,
+                'source_url': source_url
+            }
+
             logger.info(f"Processing document: {doc['filename']}")
             
             # Determine chunking strategy based on document type
@@ -469,8 +483,7 @@ def main():
     """Main function to run hybrid chunking pipeline"""
     logger.info("Starting hybrid chunking pipeline...")
     
-    # Initialize chunker
-    chunker = HybridDocumentChunker()
+    chunker = HybridChunkingPipeline()
     
     # Load documents
     documents = chunker.load_documents()

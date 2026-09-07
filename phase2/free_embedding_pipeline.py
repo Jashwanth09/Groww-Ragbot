@@ -16,7 +16,7 @@ from sentence_transformers import SentenceTransformer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class FreeEmbeddingGenerator:
+class EmbeddingPipeline:
     """Generates embeddings using BGE model - completely free"""
     
     def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5"):
@@ -178,7 +178,7 @@ def main():
     logger.info("Starting BGE embedding generation pipeline...")
     
     # Initialize generator
-    generator = FreeEmbeddingGenerator()
+    generator = EmbeddingPipeline()
     
     # Load chunks
     chunks = generator.load_chunks()

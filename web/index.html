@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groww - Grow your wealth</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            color: #44475b;
+            line-height: 1.6;
+        }
+
+        /* Header - Enhanced with glassmorphism */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 64px;
+            border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 208, 156, 0.3);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #44475b;
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 36px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #44475b;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d09c, #00a4e4);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav a:hover {
+            color: #00d09c;
+        }
+
+        .nav a:hover::after {
+            width: 100%;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f6f6f7;
+            border-radius: 12px;
+            padding: 10px 18px;
+            width: 320px;
+            border: 1px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-box:focus-within {
+            background: #ffffff;
+            border-color: rgba(0, 208, 156, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 208, 156, 0.1);
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            margin-left: 10px;
+            color: #44475b;
+        }
+
+        .search-box input::placeholder {
+            color: #7c7e8c;
+            transition: color 0.3s;
+        }
+
+        .search-box:focus-within input::placeholder {
+            color: #999;
+        }
+
+        .search-shortcut {
+            font-size: 11px;
+            color: #7c7e8c;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #ddd;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 208, 156, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 208, 156, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Market Indices - Enhanced with cards */
+        .market-indices {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 20px;
+            border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+            background: linear-gradient(180deg, #fafafb 0%, #f5f7fa 100%);
+        }
+
+        .index-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(229, 229, 229, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .index-item:hover {
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .index-name {
+            color: #7c7e8c;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .index-value {
+            color: #44475b;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .index-change {
+            color: #00d09c;
+            font-weight: 600;
+            background: rgba(0, 208, 156, 0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .index-change.negative {
+            color: #eb5b3c;
+            background: rgba(235, 91, 60, 0.1);
+        }
+
+        /* Hero Section - Enhanced spacing and typography */
+        .hero {
+            text-align: center;
+            padding: 100px 24px 60px;
+        }
+
+        .hero h1 {
+            font-size: 80px;
+            font-weight: 800;
+            color: #44475b;
+            margin-bottom: 48px;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #44475b 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .get-started-btn {
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            color: white;
+            border: none;
+            padding: 18px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(0, 208, 156, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .get-started-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .get-started-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(0, 208, 156, 0.45);
+        }
+
+        .get-started-btn:hover::before {
+            left: 100%;
+        }
+
+        .get-started-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Illustration - Enhanced with subtle animations */
+        .illustration {
+            display: flex;
+            justify-content: center;
+            margin-top: 80px;
+            padding: 0 64px 80px;
+        }
+
+        .illustration svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.08));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Chatbot Button - Enhanced */
+        .chatbot-button {
+            position: fixed;
+            bottom: 16px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(0, 208, 156, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.08) rotate(5deg);
+            box-shadow: 0 8px 32px rgba(0, 208, 156, 0.5);
+        }
+
+        .chatbot-button:active {
+            transform: scale(0.98);
+        }
+
+        .chatbot-button svg {
+            width: 26px;
+            height: 26px;
+            fill: white;
+            transition: transform 0.3s;
+        }
+
+        .chatbot-button:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Chatbot Modal - Compact floating widget */
+        .chatbot-modal {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            height: 520px;
+            max-height: 520px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            overflow: hidden;
+            flex-direction: column;
+            border: 1px solid rgba(229, 229, 229, 0.6);
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chatbot-modal.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0, 208, 156, 0.2);
+            flex-shrink: 0;
+        }
+
+        .chatbot-header h3 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(172, 153, 153, 0.2);
+        }
+
+        .chatbot-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fafafb;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-nav">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <span class="logo-text">Groww</span>
+            </div>
+            <nav class="nav">
+                <a href="#">Stocks</a>
+                <a href="#">F&O</a>
+                <a href="#">Mutual Funds</a>
+                <a href="#">More</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="#7C7E8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 14L11.1333 11.1333" stroke="#7C7E8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" placeholder="Search Groww...">
+            </div>
+            <button class="login-btn">Login/Sign up</button>
+        </div>
+    </header>
+
+    <!-- Market Indices -->
+    <div class="market-indices">
+        <div class="index-item">
+            <span class="index-name">NIFTY</span>
+            <span class="index-value">26,521.25</span>
+            <span class="index-change">↑ 0.67%</span>
+        </div>
+        <div class="index-item">
+            <span class="index-name">NIFTYBANK</span>
+            <span class="index-value">24,353.55</span>
+            <span class="index-change">↑ 0.65%</span>
+        </div>
+        <div class="index-item">
+            <span class="index-name">NIFTYSMALLCAP250</span>
+            <span class="index-value">16,439.25</span>
+            <span class="index-change">↑ 1.48%</span>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Groww Your Wealth</h1>
+
+
+
+        <button class="get-started-btn">Get started</button>
+    </section>
+
+    <!-- Illustration -->
+    <div class="illustration">
+        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background -->
+            <rect width="800" height="400" fill="#f8f9fa"/>
+            
+            <!-- Central Tower -->
+            <rect x="360" y="100" width="80" height="200" fill="#e8f5f1" stroke="#00d09c" stroke-width="2"/>
+            <rect x="370" y="120" width="60" height="20" fill="#00d09c" opacity="0.3"/>
+            <rect x="370" y="160" width="60" height="20" fill="#00d09c" opacity="0.3"/>
+            <rect x="370" y="200" width="60" height="20" fill="#00d09c" opacity="0.3"/>
+            <rect x="370" y="240" width="60" height="20" fill="#00d09c" opacity="0.3"/>
+            
+            <!-- Tower Top -->
+            <ellipse cx="400" cy="100" rx="40" ry="10" fill="#00d09c" opacity="0.5"/>
+            
+            <!-- Left Building -->
+            <rect x="200" y="180" width="100" height="120" fill="#f0f7ff" stroke="#00a4e4" stroke-width="2"/>
+            <rect x="215" y="200" width="20" height="20" fill="#00a4e4" opacity="0.3"/>
+            <rect x="250" y="200" width="20" height="20" fill="#00a4e4" opacity="0.3"/>
+            <rect x="215" y="240" width="20" height="20" fill="#00a4e4" opacity="0.3"/>
+            <rect x="250" y="240" width="20" height="20" fill="#00a4e4" opacity="0.3"/>
+            
+            <!-- Right Building -->
+            <rect x="500" y="160" width="120" height="140" fill="#fff5f0" stroke="#ff6b6b" stroke-width="2"/>
+            <rect x="520" y="180" width="25" height="25" fill="#ff6b6b" opacity="0.2"/>
+            <rect x="560" y="180" width="25" height="25" fill="#ff6b6b" opacity="0.2"/>
+            <rect x="520" y="220" width="25" height="25" fill="#ff6b6b" opacity="0.2"/>
+            <rect x="560" y="220" width="25" height="25" fill="#ff6b6b" opacity="0.2"/>
+            
+            <!-- Connecting Path -->
+            <path d="M 300 250 Q 330 280 360 280" stroke="#00d09c" stroke-width="3" fill="none"/>
+            <path d="M 440 280 Q 470 280 500 250" stroke="#00d09c" stroke-width="3" fill="none"/>
+            
+            <!-- Trees -->
+            <circle cx="150" cy="280" r="20" fill="#00d09c" opacity="0.4"/>
+            <rect x="145" y="280" width="10" height="20" fill="#8b7355"/>
+            
+            <circle cx="650" cy="270" r="25" fill="#00d09c" opacity="0.4"/>
+            <rect x="642" y="270" width="16" height="25" fill="#8b7355"/>
+            
+            <!-- Mutual Funds Sign -->
+            <rect x="620" y="200" width="80" height="40" fill="#00d09c" rx="4"/>
+            <text x="660" y="225" text-anchor="middle" fill="white" font-size="10" font-weight="600">MUTUAL FUNDS</text>
+            
+            <!-- Small decorative elements -->
+            <circle cx="250" cy="150" r="8" fill="#ffd93d" opacity="0.6"/>
+            <circle cx="550" cy="130" r="6" fill="#ff6b6b" opacity="0.4"/>
+        </svg>
+    </div>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" onclick="toggleChatbot()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+            <path d="M7 9h10v2H7zm0-3h10v2H7z"/>
+        </svg>
+    </button>
+
+    <!-- Chatbot Modal -->
+   <div class="chatbot-modal" id="chatbotModal">
+        <div class="chatbot-header">
+            <h3> Groww Assistant</h3>
+            <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+        </div>
+        <iframe class="chatbot-iframe" id="chatbotIframe" src=""></iframe>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const modal = document.getElementById('chatbotModal');
+            const iframe = document.getElementById('chatbotIframe');
+            
+            if (!modal.classList.contains('active')) {
+                // Load iframe src when opening
+                setTimeout(() => {
+                    iframe.src = 'http://localhost:8504';
+                }, 100);
+                modal.classList.add('active');
+            } else {
+                // Clear iframe src when closing to stop background processes
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    iframe.src = '';
+                }, 300);
+            }
+        }
+
+        // Keyboard shortcut to open chatbot
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '/') {
+                e.preventDefault();
+                toggleChatbot();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('chatbotModal');
+            const button = document.querySelector('.chatbot-button');
+            
+            if (modal.classList.contains('active') && 
+                !modal.contains(e.target) && 
+                !button.contains(e.target)) {
+                toggleChatbot();
+            }
+        });
+    </script>
+</body>
+</html>

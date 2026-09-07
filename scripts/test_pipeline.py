@@ -129,6 +129,8 @@ def test_phase2_components():
     logger.info("Testing Phase 2 components...")
     
     try:
+        from free_embedding_pipeline import EmbeddingPipeline
+        from vector_store_manager import VectorStoreManager
         # Test embedding pipeline
         embedding_pipeline = EmbeddingPipeline()
         logger.info("✅ EmbeddingPipeline initialized")
@@ -254,8 +256,8 @@ def run_mini_pipeline_test():
         from free_embedding_pipeline import EmbeddingPipeline
         embedding_pipeline = EmbeddingPipeline()
         
-        sample_texts = [chunk['text'] for chunk in chunks[:2]]  # Just 2 chunks for test
-        embeddings = embedding_pipeline.generate_embeddings(sample_texts)
+        sample_chunks = chunks[:2]  # Just 2 chunks for test
+        embeddings = embedding_pipeline.generate_embeddings(sample_chunks)
         logger.info(f"✅ Mini pipeline test: Generated {len(embeddings)} embeddings")
         
         # Clean up test files

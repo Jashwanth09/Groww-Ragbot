@@ -27,7 +27,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('../logs/scraping_service.log'),
+        logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'logs', 'scraping_service.log')),
         logging.StreamHandler()
     ]
 )
@@ -858,7 +858,11 @@ class GrowwScraper:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             filename = f"fund_data_{timestamp}.json"
         
-        filepath = os.path.join('../raw_data', filename)
+        # Get absolute path to raw_data directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(current_dir))
+        raw_data_dir = os.path.join(project_root, 'raw_data')
+        filepath = os.path.join(raw_data_dir, filename)
         
         # Create enhanced data structure
         enhanced_data = {

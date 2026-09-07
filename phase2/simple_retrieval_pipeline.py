@@ -71,18 +71,14 @@ class SimpleRetrievalPipeline:
                 scored_chunks.append({
                     "chunk_id": chunk['chunk_id'],
                     "text": chunk['text'],
-                    "metadata": {
-                        "scheme_name": chunk['scheme_name'],
-                        "chunk_type": chunk['chunk_type'],
-                        "source_url": chunk['source_url'],
-                        "filename": chunk['filename'],
-                        "section_title": chunk['section_title']
-                    },
-                    "keyword_score": score
+                    "section_type": chunk.get('section_type', 'unknown'),
+                    "scheme": chunk.get('scheme', 'unknown'),
+                    "source_url": chunk.get('source_url', ''),
+                    "score": score
                 })
         
         # Sort by keyword score
-        scored_chunks.sort(key=lambda x: x['keyword_score'], reverse=True)
+        scored_chunks.sort(key=lambda x: x['score'], reverse=True)
         return scored_chunks[:k]
     
     def semantic_search_by_embedding_match(self, query: str, k: int = 5) -> List[Dict]:

@@ -38,7 +38,7 @@ PyMuPDF==1.23.8  # For PDF processing
 # hashlib is built-in, for content hashing
 
 # Phase 2: Embedding and Vector Database (Free)
-sentence-transformers==2.2.2
+sentence-transformers>=2.2.2
 faiss-cpu==1.7.4
 scikit-learn==1.3.2
 

@@ -185,11 +185,8 @@ class DailyIngestPipeline:
             # Initialize embedding pipeline
             embedding_pipeline = EmbeddingPipeline()
             
-            # Extract text from chunks
-            chunk_texts = [chunk['text'] for chunk in chunks]
-            
             # Generate embeddings
-            embeddings = embedding_pipeline.generate_embeddings(chunk_texts)
+            embeddings = embedding_pipeline.generate_embeddings(chunks)
             
             if len(embeddings) != len(chunks):
                 raise Exception(f"Embedding count mismatch: {len(embeddings)} vs {len(chunks)}")

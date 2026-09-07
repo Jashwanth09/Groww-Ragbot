@@ -57,7 +57,7 @@ class RetrievalPipeline:
                 enhanced_result = {
                     "rank": result["rank"],
                     "chunk_id": result["chunk_id"],
-                    "text": self._get_chunk_text(result["chunk_id"]),
+                    "text": result["metadata"].get("text_preview", "Text not found"),
                     "metadata": result["metadata"],
                     "distance": result["distance"],
                     "similarity_score": result["similarity_score"],

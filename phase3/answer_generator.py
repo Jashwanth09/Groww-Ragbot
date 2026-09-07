@@ -13,8 +13,8 @@ from datetime import datetime
 from llm_config import LLMConfig, setup_logging
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase2'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase4'))
-from simple_retrieval_pipeline import RetrievalPipeline
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
+from retrieval_pipeline import RetrievalPipeline
 from safety import SafetyLayer, QueryType
 
 logger = logging.getLogger(__name__)
@@ -211,10 +211,13 @@ RULES:
                 }
             
             # Retrieve relevant chunks
-            retrieved_chunks = self.retrieval_pipeline.search(
+            retrieved_chunks = self.retrieval_pipeline.process_query(
                 query, 
-                top_k=self.config.top_k,
-                similarity_threshold=self.config.similarity_threshold
+                k=self.config.top_k
+            )
+            # Filter by threshold if needed
+            retrieved_chunks = self.retrieval_pipeline.filter_results(
+                retrieved_chunks, min_similarity=self.config.similarity_threshold
             )
             
             if not retrieved_chunks:
@@ -264,7 +267,7 @@ Provide a factual answer following all rules in the system prompt."""
                 "query": query,
                 "answer": answer,
                 "type": "factual_answer",
-                "confidence": "high" if retrieved_chunks[0]["score"] < 0.5 else "medium",
+                "confidence": "high" if retrieved_chunks[0].get("distance", 1.0) < 0.5 else "medium",
                 "retrieved_chunks": retrieved_chunks[:3],
                 "citation_valid": citation_valid,
                 "quality_check": quality_check,

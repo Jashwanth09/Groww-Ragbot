@@ -20,8 +20,12 @@ logger = logging.getLogger(__name__)
 class VectorStoreManager:
     """Manages FAISS vector index for semantic search"""
     
-    def __init__(self, index_path: str = "faiss_index.bin", 
-                 metadata_path: str = "metadata_store.json"):
+    def __init__(self, index_path: str = None, 
+                 metadata_path: str = None):
+        if index_path is None:
+            index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "faiss_index.bin")
+        if metadata_path is None:
+            metadata_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metadata_store.json")
         self.index_path = Path(index_path)
         self.metadata_path = Path(metadata_path)
         self.index = None
@@ -133,17 +137,20 @@ class VectorStoreManager:
             if len(query_embedding.shape) == 1:
                 query_embedding = query_embedding.reshape(1, -1)
             
+            query_embedding = np.array(query_embedding, dtype=np.float32)
+            
             # Search FAISS index
             distances, indices = self.index.search(query_embedding, k)
             
             # Prepare results
             results = []
             for i, (distance, idx) in enumerate(zip(distances[0], indices[0])):
-                if idx >= 0 and idx < len(self.metadata_store):
+                str_idx = str(idx)
+                if idx >= 0 and str_idx in self.metadata_store:
                     result = {
                         'rank': i + 1,
-                        'chunk_id': self.metadata_store[idx]['chunk_id'],
-                        'metadata': self.metadata_store[idx],
+                        'chunk_id': self.metadata_store[str_idx]['chunk_id'],
+                        'metadata': self.metadata_store[str_idx],
                         'distance': float(distance),
                         'similarity_score': 1 / (1 + float(distance))  # Convert to similarity
                     }
@@ -152,6 +159,8 @@ class VectorStoreManager:
             return results
             
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             logger.error(f"Error during search: {str(e)}")
             return []
     
