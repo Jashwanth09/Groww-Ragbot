@@ -552,6 +552,20 @@
     </div>
 
     <script>
+        const CHATBOT_PORT = '8504';
+
+        function chatbotUrl() {
+            const { protocol, hostname, port } = window.location;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `${protocol}//${hostname}:${CHATBOT_PORT}`;
+            }
+            // Hosts that encode the port as a subdomain prefix, e.g. 8080--id.example.com
+            if (port === '' && /^\d+--/.test(hostname)) {
+                return `${protocol}//${hostname.replace(/^\d+--/, CHATBOT_PORT + '--')}`;
+            }
+            return `${protocol}//${hostname}:${CHATBOT_PORT}`;
+        }
+
         function toggleChatbot() {
             const modal = document.getElementById('chatbotModal');
             const iframe = document.getElementById('chatbotIframe');
@@ -559,7 +573,7 @@
             if (!modal.classList.contains('active')) {
                 // Load iframe src when opening
                 setTimeout(() => {
-                    iframe.src = 'http://localhost:8504';
+                    iframe.src = chatbotUrl();
                 }, 100);
                 modal.classList.add('active');
             } else {
