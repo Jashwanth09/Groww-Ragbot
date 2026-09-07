@@ -35,12 +35,16 @@ except ImportError:
     print("Warning: Could not import data_cleanup. Manual cleanup only.")
     DataCleanupManager = None
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'config', 'scheduler_config.json')
+LOGS_DIR = os.path.join(PROJECT_ROOT, 'logs')
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'logs', 'scheduler_service.log')),
+        logging.FileHandler(os.path.join(LOGS_DIR, 'scheduler_service.log')),
         logging.StreamHandler()
     ]
 )
@@ -50,13 +54,15 @@ logger = logging.getLogger(__name__)
 class FundDataScheduler:
     """Scheduler for automated fund data collection"""
     
-    def __init__(self, config_path: str = '../config/scheduler_config.json'):
+    def __init__(self, config_path: Optional[str] = None):
         """
         Initialize the scheduler
         
         Args:
             config_path: Path to configuration file
         """
+        if config_path is None:
+            config_path = DEFAULT_CONFIG_PATH
         self.config = self._load_config(config_path)
         self.scheduler = None
         self.urls = self.config.get('urls', [])
@@ -162,7 +168,7 @@ class FundDataScheduler:
         }
         
         try:
-            log_file = '../logs/job_execution.log'
+            log_file = os.path.join(LOGS_DIR, 'job_execution.log')
             with open(log_file, 'a') as f:
                 f.write(json.dumps(log_entry) + '\n')
         except Exception as e:
@@ -181,7 +187,7 @@ class FundDataScheduler:
     def _get_consecutive_failures(self, job_id: str) -> int:
         """Get count of consecutive failures for a job"""
         try:
-            log_file = '../logs/job_execution.log'
+            log_file = os.path.join(LOGS_DIR, 'job_execution.log')
             if not os.path.exists(log_file):
                 return 0
             
@@ -367,7 +373,7 @@ class FundDataScheduler:
                 "pipeline_type": "chunking_embedding"
             }
             
-            with open('../logs/pipeline_trigger.log', 'a') as f:
+            with open(os.path.join(LOGS_DIR, 'pipeline_trigger.log'), 'a') as f:
                 f.write(json.dumps(pipeline_log) + '\n')
             
             logger.info("Reprocessing pipeline triggered successfully")
@@ -378,7 +384,7 @@ class FundDataScheduler:
     def _log_collection_result(self, result: Dict):
         """Log collection result"""
         try:
-            log_file = '../logs/collection_results.log'
+            log_file = os.path.join(LOGS_DIR, 'collection_results.log')
             with open(log_file, 'a') as f:
                 f.write(json.dumps(result) + '\n')
         except Exception as e:
@@ -519,7 +525,7 @@ class FundDataScheduler:
     def get_collection_history(self, days: int = 7) -> List[Dict]:
         """Get collection history for specified number of days"""
         try:
-            log_file = '../logs/collection_results.log'
+            log_file = os.path.join(LOGS_DIR, 'collection_results.log')
             if not os.path.exists(log_file):
                 return []
             
