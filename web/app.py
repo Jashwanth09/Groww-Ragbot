@@ -878,7 +878,7 @@ def handle_quick_action(action):
         response = "SIP (Systematic Investment Plan) is a smart way to invest in mutual funds. You invest a fixed amount regularly (monthly/quarterly) in your chosen mutual fund scheme. It helps in building wealth over time through the power of compounding! 💰"
     elif action == "Check Balance":
         response = "To check your balance, please log in to your Groww account. You can view your portfolio, holdings, and available balance in the dashboard section."
-    elif action == "Top Funds 2024":
+    elif action == "Top Funds":
         response = "Here are some popular fund categories you can explore:\n\n• Large Cap Funds\n• Mid Cap Funds\n• Small Cap Funds\n• Flexi Cap Funds\n• Index Funds\n\nWould you like to know more about any specific category?"
     elif action == "How to invest?":
         response = "Getting started is easy!\n\n1. Download the Groww app\n2. Complete KYC verification\n3. Add funds to your account\n4. Choose your investment (Stocks, Mutual Funds, etc.)\n5. Place your order\n\nNeed help with any specific step?"
@@ -886,6 +886,8 @@ def handle_quick_action(action):
         response = "Mutual funds are a great way to diversify your investments. Here are the main types:\n\n• Equity Funds - High growth potential\n• Debt Funds - Stable returns\n• Hybrid Funds - Balanced approach\n• Tax Saving Funds (ELSS) - Tax benefits\n\nWhich type interests you?"
     elif action == "Stocks":
         response = "Stocks represent ownership in a company. When you buy stocks, you become a shareholder. You can profit through:\n\n• Price appreciation\n• Dividends\n\nGroww offers stocks from NSE and BSE. Would you like to explore specific stocks or sectors?"
+    else:
+        response = "I'm not sure about that one yet. Ask me about a scheme's NAV, expense ratio, or minimum SIP."
     
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.rerun()
