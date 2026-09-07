@@ -1,160 +1,45 @@
-name: Complete Daily Ingest Pipeline
+name: Refresh live fund data
 
 on:
   schedule:
-    - cron: '15 9 * * 1-5'  # 9:15 AM Monday-Friday (market days)
-  workflow_dispatch:  # Manual trigger for testing
-  push:
-    branches: [ main, develop ]
-    paths: 
-      - 'phase1/**'
-      - 'phase2/**'
-      - 'scripts/**'
-      - 'config/**'
+    # 9:15 AM IST on weekdays (GitHub cron is UTC)
+    - cron: "45 3 * * 1-5"
+  workflow_dispatch:
 
-env:
-  PYTHON_VERSION: '3.9'
-  CHROME_VERSION: 'latest'
+permissions:
+  contents: write
 
 jobs:
-  complete-ingest-pipeline:
+  scrape-and-publish:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            
-      - name: Install dependencies
+          python-version: "3.11"
+
+      - name: Install scrape dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          
-      - name: Install Chrome and WebDriver
+          pip install -r requirements-scrape.txt
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Scrape Groww and publish chatbot data
+        run: python scripts/publish_latest_fund_data.py
+
+      - name: Commit published fund data
         run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          chrome --version
-          
-      - name: Create necessary directories
-        run: |
-          mkdir -p raw_data processed_data logs phase2
-          
-      - name: Run Complete Daily Ingest Pipeline
-        run: |
-          python scripts/daily_ingest_pipeline.py
-        env:
-          HEADLESS: true
-          LOG_LEVEL: INFO
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          
-      - name: Validate Pipeline Results
-        run: |
-          python -c "
-          import json
-          import os
-          import pickle
-          from pathlib import Path
-          
-          print('Validating pipeline results...')
-          
-          # Check raw data
-          raw_data_dir = Path('raw_data')
-          raw_files = list(raw_data_dir.glob('*.json'))
-          print(f'✅ Raw data files: {len(raw_files)}')
-          
-          # Check processed data
-          processed_data_dir = Path('processed_data')
-          processed_files = list(processed_data_dir.glob('*.json'))
-          print(f'✅ Processed data files: {len(processed_files)}')
-          
-          # Check embeddings
-          phase2_dir = Path('phase2')
-          embeddings_files = list(phase2_dir.glob('embeddings*.pkl'))
-          print(f'✅ Embedding files: {len(embeddings_files)}')
-          
-          # Check FAISS index
-          faiss_index = phase2_dir / 'faiss_index.bin'
-          if faiss_index.exists():
-              print('✅ FAISS index exists')
-              # Check index size
-              import faiss
-              index = faiss.read_index(str(faiss_index))
-              print(f'✅ FAISS index vectors: {index.ntotal}')
-          else:
-              raise Exception('FAISS index not found')
-          
-          # Check metadata
-          metadata_file = phase2_dir / 'metadata_store.json'
-          if metadata_file.exists():
-              with open(metadata_file, 'r') as f:
-                  metadata = json.load(f)
-                  print(f'✅ Metadata entries: {len(metadata)}')
-          else:
-              raise Exception('Metadata file not found')
-          
-          print('✅ All pipeline validations passed!')
-          "
-          
-      - name: Upload pipeline artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: ingest-pipeline-${{ github.run_number }}
-          path: |
-            raw_data/
-            processed_data/
-            phase2/embeddings*.pkl
-            phase2/embeddings*.json
-            phase2/faiss_index.bin
-            phase2/metadata_store.json
-            logs/
-          retention-days: 30
-          
-      - name: Commit and push changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # Add all pipeline outputs
-          git add raw_data/ processed_data/ phase2/embeddings*.pkl phase2/embeddings*.json phase2/faiss_index.bin phase2/metadata_store.json logs/
-          
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data/latest_fund_data.json
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No fund-data changes to commit"
           else
-            git commit -m "Auto-update: Complete ingest pipeline executed on $(date '+%Y-%m-%d %H:%M:%S')
-            
-            - Scraped latest fund data
-            - Processed into chunks  
-            - Generated embeddings
-            - Updated FAISS vector database"
+            git commit -m "Refresh live fund metrics for the deployed chatbot"
             git push
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Trigger downstream pipeline
-        if: success()
-        run: |
-          echo "Triggering downstream RAG pipeline..."
-          # This will automatically trigger pipeline.yml due to file changes
-          
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "❌ Complete ingest pipeline failed! Check logs for details."
-          echo "Failed at: $(date '+%Y-%m-%d %H:%M:%S')"
-          # Add email/Slack notification logic here if needed

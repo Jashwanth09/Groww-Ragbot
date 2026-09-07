@@ -419,12 +419,86 @@
             background: rgba(172, 153, 153, 0.2);
         }
 
-        .chatbot-iframe {
+        .chatbot-body {
             flex: 1;
-            width: 100%;
-            border: none;
+            display: flex;
+            flex-direction: column;
             background: #fafafb;
-            overflow: hidden;
+            min-height: 0;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 10px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+        }
+
+        .chat-bubble.assistant {
+            background: #ffffff;
+            color: #44475b;
+            align-self: flex-start;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .chat-bubble.user {
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            color: #ffffff;
+            align-self: flex-end;
+        }
+
+        .chat-quick {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 16px 8px;
+        }
+
+        .chat-quick button {
+            border: 1px solid #dbe4ee;
+            background: #ffffff;
+            color: #44475b;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chatbot-form {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 16px;
+            border-top: 1px solid #eef1f5;
+            background: #ffffff;
+        }
+
+        .chatbot-form input {
+            flex: 1;
+            border: 1px solid #dbe4ee;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .chatbot-form button {
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d09c 0%, #00a4e4 100%);
+            color: #ffffff;
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -548,30 +622,85 @@
             <h3> Groww Assistant</h3>
             <button class="chatbot-close" onclick="toggleChatbot()">×</button>
         </div>
-        <iframe class="chatbot-iframe" id="chatbotIframe" src=""></iframe>
+        <div class="chatbot-body">
+            <div class="chatbot-messages" id="chatMessages"></div>
+            <div class="chat-quick">
+                <button type="button" data-chat="What is SIP?">What is SIP?</button>
+                <button type="button" data-chat="Top Funds">Top Funds</button>
+                <button type="button" data-chat="Large Cap Fund NAV">Large Cap NAV</button>
+            </div>
+            <form class="chatbot-form" id="chatForm">
+                <input id="chatInput" autocomplete="off" placeholder="Ask about mutual funds..." />
+                <button type="submit">Send</button>
+            </form>
+        </div>
     </div>
 
     <script>
-        function toggleChatbot() {
-            const modal = document.getElementById('chatbotModal');
-            const iframe = document.getElementById('chatbotIframe');
-            
-            if (!modal.classList.contains('active')) {
-                // Load iframe src when opening
-                setTimeout(() => {
-                    iframe.src = 'http://127.0.0.1:8501';
-                }, 100);
-                modal.classList.add('active');
-            } else {
-                // Clear iframe src when closing to stop background processes
-                modal.classList.remove('active');
-                setTimeout(() => {
-                    iframe.src = '';
-                }, 300);
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        let chatStarted = false;
+
+        function addBubble(role, text) {
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble ' + role;
+            bubble.textContent = text;
+            chatMessages.appendChild(bubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function ensureWelcome() {
+            if (!chatStarted) {
+                addBubble('assistant', "Hi there! I'm your Groww Assistant. How can I help you with your investments today?");
+                chatStarted = true;
             }
         }
 
-        // Keyboard shortcut to open chatbot
+        async function sendChat(message) {
+            ensureWelcome();
+            addBubble('user', message);
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                if (!response.ok) {
+                    throw new Error('Chat request failed');
+                }
+                const data = await response.json();
+                addBubble('assistant', data.answer || 'I could not process that right now.');
+            } catch (error) {
+                addBubble('assistant', 'The chat API is not reachable. On Vercel this needs a successful deploy; locally run: python -m uvicorn app:app --reload --port 8000');
+            }
+        }
+
+        function toggleChatbot() {
+            const modal = document.getElementById('chatbotModal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                ensureWelcome();
+                chatInput.focus();
+            }
+        }
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message) {
+                return;
+            }
+            chatInput.value = '';
+            sendChat(message);
+        });
+
+        document.querySelectorAll('.chat-quick button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                sendChat(button.getAttribute('data-chat'));
+            });
+        });
+
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === '/') {
                 e.preventDefault();
@@ -579,13 +708,11 @@
             }
         });
 
-        // Close modal when clicking outside
         document.addEventListener('click', function(e) {
             const modal = document.getElementById('chatbotModal');
             const button = document.querySelector('.chatbot-button');
-            
-            if (modal.classList.contains('active') && 
-                !modal.contains(e.target) && 
+            if (modal.classList.contains('active') &&
+                !modal.contains(e.target) &&
                 !button.contains(e.target)) {
                 toggleChatbot();
             }

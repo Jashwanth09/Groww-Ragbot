@@ -53,6 +53,7 @@ openai==1.3.5
 
 # Phase 4: Web Interface and Deployment
 streamlit>=1.28.0
+fastapi>=0.117.1
 # Additional web dependencies (optional)
 # streamlit-chat>=0.1.0
 # plotly>=5.17.0

@@ -1,0 +1,12 @@
+.python311
+.venv.broken
+.venv
+venv
+.git
+**/__pycache__
+*.pyc
+*.pkl
+*.bin
+logs
+.cursor
+agent-transcripts
