@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "collection_metadata": {
-    "date": "2026-10-08",
+    "date": "2026-10-09",
     "source": "Groww",
     "total_schemes": 4,
     "data_quality_score": 0.6,
@@ -16,8 +16,8 @@
       },
       "key_metrics": {
         "nav": {
-          "value": 865.98,
-          "date": "2026-10-08",
+          "value": 855.04,
+          "date": "2026-10-09",
           "currency": "INR"
         },
         "minimum_sip": 0,
@@ -31,8 +31,8 @@
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-dynamic-plan-direct-growth",
-        "scraped_at": "2026-10-08T10:56:34.734107",
-        "last_updated": "2026-10-08T10:56:34.734098"
+        "scraped_at": "2026-10-09T10:55:32.504699",
+        "last_updated": "2026-10-09T10:55:32.504690"
       }
     },
     {
@@ -43,8 +43,8 @@
       },
       "key_metrics": {
         "nav": {
-          "value": 113.07,
-          "date": "2026-10-08",
+          "value": 111.2,
+          "date": "2026-10-09",
           "currency": "INR"
         },
         "minimum_sip": 0,
@@ -58,8 +58,8 @@
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-large-cap-fund-direct-growth",
-        "scraped_at": "2026-10-08T10:56:41.824187",
-        "last_updated": "2026-10-08T10:56:41.824176"
+        "scraped_at": "2026-10-09T10:55:39.702655",
+        "last_updated": "2026-10-09T10:55:39.702646"
       }
     },
     {
@@ -71,7 +71,7 @@
       "key_metrics": {
         "nav": {
           "value": 50.0,
-          "date": "2026-10-08",
+          "date": "2026-10-09",
           "currency": "INR"
         },
         "minimum_sip": 0,
@@ -85,8 +85,8 @@
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-nifty-next-50-index-fund-direct-growth",
-        "scraped_at": "2026-10-08T10:56:48.816942",
-        "last_updated": "2026-10-08T10:56:48.816932"
+        "scraped_at": "2026-10-09T10:55:46.888723",
+        "last_updated": "2026-10-09T10:55:46.888714"
       }
     },
     {
@@ -97,8 +97,8 @@
       },
       "key_metrics": {
         "nav": {
-          "value": 1098.29,
-          "date": "2026-10-08",
+          "value": 1068.5,
+          "date": "2026-10-09",
           "currency": "INR"
         },
         "minimum_sip": 0,
@@ -112,8 +112,8 @@
       },
       "source_data": {
         "url": "https://groww.in/mutual-funds/icici-prudential-top-100-fund-direct-growth",
-        "scraped_at": "2026-10-08T10:56:55.305588",
-        "last_updated": "2026-10-08T10:56:55.305578"
+        "scraped_at": "2026-10-09T10:55:53.876420",
+        "last_updated": "2026-10-09T10:55:53.876410"
       }
     }
   ],
